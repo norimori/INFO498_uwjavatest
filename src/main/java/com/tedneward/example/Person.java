@@ -3,7 +3,7 @@ package com.tedneward.example;
 import java.beans.*;
 import java.util.*;
 
-public class Person {
+public class Person implements Comparable<Person> {
   private int age;
   private String name;
   private double salary;
@@ -18,30 +18,57 @@ public class Person {
     name = n;
     age = a;
     salary = s;
+    ssn = "";
   }
 
+  //AGE
   public int getAge() {
     return age;
   }
   
+  public void setAge(int value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Given age <" + "> is not valid.");
+    }
+     int old = age;
+     age = value;
+  }
+  
+  //NAME
   public String getName() {
     return name;
   }
+
+  public void setName(String value) {
+    if (value == null) {
+      throw new IllegalArgumentException("Given name <" + "> is not valid.");
+    }    
+    String old = name;
+    name = value;
+  }
   
+  //SALARY
   public double getSalary() {
     return salary;
   }
+
+  public void setSalary(double value) {
+    double old = salary;
+    salary = value;
+  }
   
+  //SSN
   public String getSSN() {
     return ssn;
   }
+  
   public void setSSN(String value) {
     String old = ssn;
     ssn = value;
-    
     this.pcs.firePropertyChange("ssn", old, value);
     propertyChangeFired = true;
   }
+  
   public boolean getPropertyChangeFired() {
     return propertyChangeFired;
   }
@@ -57,13 +84,34 @@ public class Person {
   public int timeWarp() {
     return age + 10;
   }
+
+  //Return ArrayList<Person> of pre-determined Neward family.
+  public static ArrayList<Person> getNewardFamily() {
+    ArrayList<Person> family = new ArrayList<Person>();
+    Person Ted = new Person("Ted", 41, 250000);
+    Person Charlotte = new Person("Charlotte", 43, 150000);
+    Person Michael = new Person("Michael", 22, 10000);
+    Person Matthew = new Person("Matthew", 15, 0);
+    family.add(Ted);
+    family.add(Charlotte);
+    family.add(Michael);
+    family.add(Matthew);
+    return family;
+  }
   
-  public boolean equals(Person other) {
-    return (this.name.equals(p.name) && this.age == p.age);
+  //Returns true if two Person instances have the same name and age.
+  @Override
+  public boolean equals(Object other) {
+  	if (other instanceof Person) {
+   		Person p = (Person)other;
+   		return p.name == this.name && p.age == this.age;
+   	}
+   	return false;
   }
 
-  public String tostring() {
-    return "{{FIXME}}";
+  @Override
+  public String toString() {
+    return "[Person name:" + name + " age:" + age + " salary:" + salary +"]";
   }
 
   // PropertyChangeListener support; you shouldn't need to change any of
@@ -76,4 +124,18 @@ public class Person {
   public void removePropertyChangeListener(PropertyChangeListener listener) {
       this.pcs.removePropertyChangeListener(listener);
   }
+
+  //Compares two Person objects and arranges them by age (ex. age 15 is less than age 25).
+  public static class AgeComparator implements Comparator<Person> {
+    public int compare(Person p1, Person p2) {
+      return p1.age - p2.age;
+    }
+  }
+
+  //Compares two Person objects and arranges them by salary in reverse order.
+  @Override
+  public int compareTo(Person other) {
+    return (int)(other.salary - this.salary); //Casted as int
+  }
 }
+
